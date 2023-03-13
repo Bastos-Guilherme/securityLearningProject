@@ -17,4 +17,6 @@ interface UserService {
     fun register(user: User): Boolean
 
     fun invalidateToken(token: String): Boolean
+
+    fun activateUser(username: String, password: String): Boolean
 }

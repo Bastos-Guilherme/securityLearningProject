@@ -17,6 +17,9 @@ class UserServiceImpl: UserService {
     @Autowired
     private lateinit var userRepository: UserRepository
 
+    @Autowired
+    private lateinit var jwtService: JwtService
+
 
     // find any user by id, throw exception if fail to find one
     override fun findById(id: Long): User {
@@ -55,6 +58,26 @@ class UserServiceImpl: UserService {
 
     // invalidade user, not implemented, does nothing as of right now
     override fun invalidateToken(token: String): Boolean {
-        return false
+        var cleanToken = ""
+        if (token.startsWith("Bearer ")) {
+            cleanToken = token.substring(7)
+        } else {
+            cleanToken = token
+        }
+        var user = userRepository.findByUsername(jwtService.extractUsername(cleanToken)).orElseThrow()
+        user.isActive = false
+        return true
+    }
+
+    // activate user
+    override fun activateUser(username: String, password: String): Boolean {
+        val user = userRepository.findByUsername(username).orElseThrow()
+        if (user.password == password) {
+            user.isActive = true
+            return true
+        } else {
+            user.failedLoginAttempts++
+            return false
+        }
     }
 }

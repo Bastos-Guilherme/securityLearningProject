@@ -8,6 +8,7 @@ import com.securityLearningProject.securityLearningProject.model.User
 import com.securityLearningProject.securityLearningProject.service.`interface`.JwtService
 import com.securityLearningProject.securityLearningProject.service.`interface`.UserService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -81,5 +82,15 @@ class AuthController() {
         @RequestHeader("Authorization", required = true) token: String
     ) : ResponseEntity<Boolean> {
         return ResponseEntity.ok(userService.invalidateToken(token))
+    }
+
+    // API endpoint responsible for login, activation of account, unprotected
+    @PutMapping("login")
+    fun activateUser(
+        @RequestHeader("username", required = true) username: String,
+        @RequestHeader("password", required = true) password: String
+    ): ResponseEntity<Boolean> {
+        val isActivated = userService.activateUser(username, passwordEncoder.encode(password))
+        return ResponseEntity.ok(isActivated)
     }
 }
