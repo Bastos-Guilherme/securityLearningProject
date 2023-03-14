@@ -13,6 +13,8 @@ interface AuthService {
 
     fun getToken(username: String, password: String): TokenDTO
 
+    fun updateCredentials(username: String, password: String, user: User): Boolean
+
     fun isAccountExpired(user: User): Boolean
 
     fun isAccountLocked(user: User): Boolean

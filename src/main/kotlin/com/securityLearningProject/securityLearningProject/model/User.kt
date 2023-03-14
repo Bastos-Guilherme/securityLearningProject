@@ -22,7 +22,7 @@ class User: UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private var id: Long? = null
+    var id: Long? = null
     @Column(unique = true)
     private var username: String? = null
     @Column(unique = true)

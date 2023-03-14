@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDate
 
 // controller for the auth process
 @RestController
@@ -54,7 +53,8 @@ class AuthController() {
         registration.permissions?.forEach {
             user.permissions += Permission.valueOf(it)
         }
-        return ResponseEntity.ok(userService.register(user))
+        userService.save(user)
+        return ResponseEntity.ok(true)
     }
 
     // API endpoint responsible for "logout", invalidation of token, protected
@@ -76,9 +76,12 @@ class AuthController() {
 
     @PutMapping("Register")
     fun updateCredentials(
-        @RequestBody(required = true) registration: RegistrationDTO
+        @RequestBody(required = true) registration: RegistrationDTO,
+        @RequestHeader("username", required = true) username: String,
+        @RequestHeader("password", required = true) password: String
     ): ResponseEntity<Boolean> {
-        val user = userService.findByUsername(registration.username!!)
+        val user = User()
+        user.username = registration.username!!
         user.email = registration.email
         user.name = registration.name
         user.lastName = registration.lastName
@@ -89,6 +92,6 @@ class AuthController() {
         registration.permissions?.forEach {
             user.permissions += Permission.valueOf(it)
         }
-        return ResponseEntity.ok(userService.register(user))
+        return ResponseEntity.ok(authService.updateCredentials(username, passwordEncoder.encode(password), user))
     }
 }

@@ -18,8 +18,7 @@ class UserServiceImpl: UserService {
         return userRepository.findByEmail(email).orElseThrow()
     }
 
-    override fun register(user: User): Boolean {
-        userRepository.save(user)
-        return true
+    override fun save(user: User): User {
+        return userRepository.save(user)
     }
 }

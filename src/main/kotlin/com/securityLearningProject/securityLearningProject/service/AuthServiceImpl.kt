@@ -97,6 +97,18 @@ class AuthServiceImpl: AuthService {
         return tokenResponse
     }
 
+    override fun updateCredentials(username: String, password: String, user: User): Boolean {
+        var oldUser = userService.findByUsername(username)
+        if (oldUser.password == password) {
+            if (isAccountLocked(oldUser)) {
+                user.id = oldUser.id
+                userService.save(oldUser)
+                return true
+            }
+        }
+        return false
+    }
+
     override fun isAccountExpired(user: User): Boolean {
         return user.lastSigning.isBefore(LocalDate.now().plusMonths(3))
     }

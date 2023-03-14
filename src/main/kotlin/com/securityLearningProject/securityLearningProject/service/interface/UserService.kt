@@ -8,5 +8,5 @@ interface UserService {
 
     fun findByEmail(email: String): User
 
-    fun register(user: User): Boolean
+    fun save(user: User): User
 }
