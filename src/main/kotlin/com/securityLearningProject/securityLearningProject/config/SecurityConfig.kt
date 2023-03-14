@@ -17,7 +17,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import java.lang.RuntimeException
 
 @Configuration
 @EnableWebSecurity
@@ -29,10 +28,6 @@ class SecurityConfig {
 
     @Autowired
     private lateinit var userService: UserService
-
-    companion object {
-        private val runtimeException = RuntimeException()
-    }
 
     // UserDetailsService configs the service for fetching users on the database
     @Bean
@@ -60,11 +55,9 @@ class SecurityConfig {
     // AuthenticationManager is the config for the authenticate config path
     @Bean
     fun publicAuthenticationManager(config: AuthenticationConfiguration?): AuthenticationManager {
-        if (config == null) {
-            throw runtimeException
-        } else {
+        if (config != null) {
             return config.authenticationManager
-        }
+        } else throw RuntimeException()
     }
 
     // Configuration for segurity, regarding how and when spring will check and act on requests

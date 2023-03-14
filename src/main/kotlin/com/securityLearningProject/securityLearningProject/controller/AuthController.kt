@@ -5,12 +5,10 @@ import com.securityLearningProject.securityLearningProject.controller.dto.TokenD
 import com.securityLearningProject.securityLearningProject.model.Permission
 import com.securityLearningProject.securityLearningProject.model.Role
 import com.securityLearningProject.securityLearningProject.model.User
-import com.securityLearningProject.securityLearningProject.service.`interface`.JwtService
+import com.securityLearningProject.securityLearningProject.service.`interface`.AuthService
 import com.securityLearningProject.securityLearningProject.service.`interface`.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
@@ -24,10 +22,7 @@ class AuthController() {
     private lateinit var userService: UserService
 
     @Autowired
-    private lateinit var jwtService: JwtService
-
-    @Autowired
-    private lateinit var authenticationManager: AuthenticationManager
+    private lateinit var authService: AuthService
 
     @Autowired
     private lateinit var passwordEncoder: PasswordEncoder
@@ -36,21 +31,10 @@ class AuthController() {
     @PostMapping("getToken")
     fun getToken(
         @RequestHeader("username", required = true) username: String,
-        @RequestHeader("password", required = true) password: String
+        @RequestHeader("password", required = true) rawPassword: String
     ) : ResponseEntity<TokenDTO> {
-        authenticationManager.authenticate(
-            UsernamePasswordAuthenticationToken(
-                username,
-                password
-            )
-        )
-        val user : User = userService.findByUsername(username)
-        user.lastSigning = LocalDate.now()
-        user.isActive = true
-        val tokenResponse = TokenDTO()
-        tokenResponse.token = jwtService.genarateToken(user)
-        tokenResponse.expirationDateTime = jwtService.extractExpiration(tokenResponse.token)
-        return ResponseEntity.ok(tokenResponse)
+        var password = passwordEncoder.encode(rawPassword)
+        return ResponseEntity.ok(authService.getToken(username, password))
     }
 
     // API endpoint responsible for registration of a new user, unprotected
@@ -70,8 +54,6 @@ class AuthController() {
         registration.permissions?.forEach {
             user.permissions += Permission.valueOf(it)
         }
-        user.credentialsLastChange = LocalDate.now()
-        user.isActive = true
         return ResponseEntity.ok(userService.register(user))
     }
 
@@ -80,7 +62,7 @@ class AuthController() {
     fun invalidateToken(
         @RequestHeader("Authorization", required = true) token: String
     ) : ResponseEntity<Boolean> {
-        return ResponseEntity.ok(userService.invactivateUser(token))
+        return ResponseEntity.ok(authService.inactivateUser(token))
     }
 
     // API endpoint responsible for login, activation of account, unprotected
@@ -89,8 +71,7 @@ class AuthController() {
         @RequestHeader("username", required = true) username: String,
         @RequestHeader("password", required = true) password: String
     ): ResponseEntity<Boolean> {
-        val isActivated = userService.activateUser(username, passwordEncoder.encode(password))
-        return ResponseEntity.ok(isActivated)
+        return ResponseEntity.ok(authService.activateUser(username, passwordEncoder.encode(password)))
     }
 
     @PutMapping("Register")
@@ -108,8 +89,6 @@ class AuthController() {
         registration.permissions?.forEach {
             user.permissions += Permission.valueOf(it)
         }
-        user.credentialsLastChange = LocalDate.now()
-        user.isActive = true
         return ResponseEntity.ok(userService.register(user))
     }
 }

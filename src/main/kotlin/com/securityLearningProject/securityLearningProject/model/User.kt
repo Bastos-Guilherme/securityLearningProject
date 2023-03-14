@@ -1,17 +1,23 @@
 package com.securityLearningProject.securityLearningProject.model
 
+import com.securityLearningProject.securityLearningProject.service.`interface`.AuthService
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import java.time.LocalDate
+import java.util.*
 import javax.persistence.*
 
 @Entity
 @Table(name = "Users")
 class User: UserDetails {
 
+    @Autowired
+    private lateinit var authService: AuthService
+
     companion object {
-        private val runtimeException: RuntimeException = RuntimeException()
+        private val runtimeException = RuntimeException()
     }
 
     @Id
@@ -31,8 +37,8 @@ class User: UserDetails {
     @Enumerated(EnumType.STRING)
     var permissions: Set<Permission> = hashSetOf()
     var isActive: Boolean = true
-    var credentialsLastChange: LocalDate = LocalDate.now()
-    var lastSigning: LocalDate = LocalDate.now()
+    var credentialsLastChange = LocalDate.now()
+    var lastSigning = LocalDate.now()
     var failedLoginAttempts: Int = 0
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
@@ -47,10 +53,6 @@ class User: UserDetails {
             authorities.add(SimpleGrantedAuthority(it.name))
         }
         return authorities
-    }
-
-    override fun isAccountNonExpired(): Boolean {
-        return lastSigning.plusYears(1) >= LocalDate.now()
     }
 
     override fun getUsername(): String {
@@ -77,15 +79,19 @@ class User: UserDetails {
         this.password = password
     }
 
+    override fun isAccountNonExpired(): Boolean {
+        return !authService.isAccountExpired(this)
+    }
+
     override fun isAccountNonLocked(): Boolean {
-        return failedLoginAttempts < 5
+        return !authService.isAccountLocked(this)
     }
 
     override fun isCredentialsNonExpired(): Boolean {
-        return credentialsLastChange.plusYears(1) >= LocalDate.now()
+        return !authService.isCredentialsExpired(this)
     }
 
     override fun isEnabled(): Boolean {
-        return isActive
+        return authService.isActive(this)
     }
 }

@@ -2,13 +2,12 @@ package com.securityLearningProject.securityLearningProject.config
 
 import com.securityLearningProject.securityLearningProject.model.User
 import com.securityLearningProject.securityLearningProject.service.`interface`.JwtService
+import com.securityLearningProject.securityLearningProject.service.`interface`.AuthService
 import com.securityLearningProject.securityLearningProject.service.`interface`.UserService
 import org.jetbrains.annotations.NotNull
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
@@ -22,6 +21,9 @@ class JwtAuthenticationFilter: OncePerRequestFilter() {
 
     @Autowired
     private lateinit var jwtService: JwtService
+
+    @Autowired
+    private lateinit var authService: AuthService
 
     @Autowired
     private lateinit var userService: UserService
@@ -50,14 +52,17 @@ class JwtAuthenticationFilter: OncePerRequestFilter() {
             val user: User = userService.findByUsername(username)
             // check if this is a valid token for this user
             if (jwtService.isTokenValid(jwt, user)) {
-                // and validade the auth to pass along the request
-                val authToken = UsernamePasswordAuthenticationToken(
-                    user,
-                    null,
-                    user.authorities
-                )
-                authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
-                SecurityContextHolder.getContext().authentication = authToken
+                // validade the account situated
+                if (authService.validadeUser(user.username, user.password)) {
+                    // and validade the auth to pass along the request
+                    val authToken = UsernamePasswordAuthenticationToken(
+                        user,
+                        null,
+                        user.authorities
+                    )
+                    authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
+                    SecurityContextHolder.getContext().authentication = authToken
+                }
             }
         }
         // call next filter, with or without the auth
