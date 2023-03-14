@@ -8,7 +8,6 @@ import com.securityLearningProject.securityLearningProject.model.User
 import com.securityLearningProject.securityLearningProject.service.`interface`.JwtService
 import com.securityLearningProject.securityLearningProject.service.`interface`.UserService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -49,8 +48,8 @@ class AuthController() {
         user.lastSigning = LocalDate.now()
         user.isActive = true
         val tokenResponse = TokenDTO()
-        tokenResponse.token = "Bearer " + jwtService.genarateToken(user)
-        tokenResponse.expirationDateTime = jwtService.extractExpiration(tokenResponse.token.substring(7))
+        tokenResponse.token = jwtService.genarateToken(user)
+        tokenResponse.expirationDateTime = jwtService.extractExpiration(tokenResponse.token)
         return ResponseEntity.ok(tokenResponse)
     }
 
@@ -81,7 +80,7 @@ class AuthController() {
     fun invalidateToken(
         @RequestHeader("Authorization", required = true) token: String
     ) : ResponseEntity<Boolean> {
-        return ResponseEntity.ok(userService.invalidateToken(token))
+        return ResponseEntity.ok(userService.invactivateUser(token))
     }
 
     // API endpoint responsible for login, activation of account, unprotected
@@ -92,5 +91,25 @@ class AuthController() {
     ): ResponseEntity<Boolean> {
         val isActivated = userService.activateUser(username, passwordEncoder.encode(password))
         return ResponseEntity.ok(isActivated)
+    }
+
+    @PutMapping("Register")
+    fun updateCredentials(
+        @RequestBody(required = true) registration: RegistrationDTO
+    ): ResponseEntity<Boolean> {
+        val user = userService.findByUsername(registration.username!!)
+        user.email = registration.email
+        user.name = registration.name
+        user.lastName = registration.lastName
+        user.password = passwordEncoder.encode(registration.password)
+        registration.roles?.forEach{
+            user.roles += Role.valueOf(it)
+        }
+        registration.permissions?.forEach {
+            user.permissions += Permission.valueOf(it)
+        }
+        user.credentialsLastChange = LocalDate.now()
+        user.isActive = true
+        return ResponseEntity.ok(userService.register(user))
     }
 }

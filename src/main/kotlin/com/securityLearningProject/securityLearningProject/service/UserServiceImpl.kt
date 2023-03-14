@@ -53,11 +53,12 @@ class UserServiceImpl: UserService {
     // create new user with data
     override fun register(user: User): Boolean {
         userRepository.save(user)
+        user.failedLoginAttempts = 0
         return true
     }
 
     // invalidade user, not implemented, does nothing as of right now
-    override fun invalidateToken(token: String): Boolean {
+    override fun invactivateUser(token: String): Boolean {
         var cleanToken = ""
         if (token.startsWith("Bearer ")) {
             cleanToken = token.substring(7)

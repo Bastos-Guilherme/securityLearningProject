@@ -12,11 +12,11 @@ interface UserService {
 
     fun deleteById(id: Long): Boolean
 
-    fun validadeUser(username: String, password: String): Boolean
+    fun validadeUser(username: String, encodedPassword: String): Boolean
 
     fun register(user: User): Boolean
 
-    fun invalidateToken(token: String): Boolean
+    fun invactivateUser(token: String): Boolean
 
     fun activateUser(username: String, password: String): Boolean
 }

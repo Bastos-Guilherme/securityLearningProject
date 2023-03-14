@@ -78,7 +78,7 @@ class SecurityConfig {
         // configuration of permissions and authentications for every available path
         http
             .authorizeRequests()
-            .antMatchers("/", "/api/v1/auth/getToken", "/api/v1/auth/register")
+            .antMatchers("/", "/api/v1/auth/getToken", "/api/v1/auth/register", "/api/v1/auth/login")
             .permitAll()
             .anyRequest()
             .authenticated()
