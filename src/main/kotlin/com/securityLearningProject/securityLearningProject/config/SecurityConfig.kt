@@ -4,6 +4,7 @@ import com.securityLearningProject.securityLearningProject.service.`interface`.U
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
@@ -71,7 +72,7 @@ class SecurityConfig {
         // configuration of permissions and authentications for every available path
         http
             .authorizeRequests()
-            .antMatchers("/", "/api/v1/auth/getToken", "/api/v1/auth/register", "/api/v1/auth/login")
+            .antMatchers(HttpMethod.POST,"/", "/api/v1/auth/getToken", "/api/v1/auth/register", "/api/v1/auth/login")
             .permitAll()
             .anyRequest()
             .authenticated()

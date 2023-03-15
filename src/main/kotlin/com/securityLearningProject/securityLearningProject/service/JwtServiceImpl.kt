@@ -9,6 +9,8 @@ import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import org.springframework.stereotype.Service
 import java.security.Key
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.function.Function
@@ -49,7 +51,7 @@ class JwtServiceImpl: JwtService {
 
     // validation of expiration for any given jwt
     private fun isTokenExpired(token: String): Boolean {
-        return extractExpiration(token).before(Date(System.currentTimeMillis()))
+        return extractExpiration(token).isBefore(LocalDate.now())
     }
 
     // extraction of username from a jwt, same format to extract anything from the jwt
@@ -64,8 +66,8 @@ class JwtServiceImpl: JwtService {
     }
 
     // extraction of the expiration date
-    override fun extractExpiration(token: String): Date {
-        return extractClaim(token, Claims::getExpiration)
+    override fun extractExpiration(token: String): LocalDate {
+        return extractClaim(token, Claims::getExpiration).toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
     }
 
     // extraction of the claims

@@ -2,6 +2,7 @@ package com.securityLearningProject.securityLearningProject.service.`interface`
 
 import com.securityLearningProject.securityLearningProject.model.User
 import io.jsonwebtoken.Claims
+import java.time.LocalDate
 import java.util.*
 import java.util.function.Function
 import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
@@ -18,5 +19,5 @@ interface JwtService {
 
     fun <T> extractClaim(token: String, claimsResolver: Function<Claims, T>): T
 
-    fun extractExpiration(token: String): Date
+    fun extractExpiration(token: String): LocalDate
 }

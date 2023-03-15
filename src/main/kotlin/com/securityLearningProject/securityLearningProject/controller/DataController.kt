@@ -16,7 +16,7 @@ class DataController {
     // API endpoint intended for read and accessible only for ADMINS and MANAGERS
     @GetMapping("adimCar")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MANAGER') or hasAuthority('ADMIN_CAR_READ')")
-    fun getAdimCar() : ResponseEntity<String> {
+    fun getAdminCar() : ResponseEntity<String> {
         return ResponseEntity.ok(adminCar)
     }
 
@@ -29,7 +29,7 @@ class DataController {
     // API endpoint intended for write and accessible only for ADMINS and MANAGERS
     @PostMapping("adimCar")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_MANAGER') or hasAuthority('ADMIN_CAR_WRITE')")
-    fun setAdimCar(
+    fun setAdminCar(
         @RequestBody(required = true) body: String
     ) : ResponseEntity<String> {
         adminCar = body
@@ -50,7 +50,7 @@ class DataController {
     // API endpoint intended for deletion and accessible only for MANAGERS with this authorization
     @DeleteMapping("adimCar")
     @PreAuthorize("hasRole('ROLE_MANAGER') and hasAuthority('ADMIN_CAR_DELETE')")
-    fun deleteAdimCar() : ResponseEntity<String> {
+    fun deleteAdminCar() : ResponseEntity<String> {
         adminCar = ""
         return ResponseEntity(HttpStatus.OK)
     }

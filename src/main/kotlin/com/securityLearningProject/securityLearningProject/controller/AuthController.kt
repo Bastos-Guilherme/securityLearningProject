@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*
 // controller for the auth process
 @RestController
 @RequestMapping("api/v1/auth")
-class AuthController() {
+class AuthController {
 
     @Autowired
     private lateinit var userService: UserService
@@ -32,7 +32,7 @@ class AuthController() {
         @RequestHeader("username", required = true) username: String,
         @RequestHeader("password", required = true) rawPassword: String
     ) : ResponseEntity<TokenDTO> {
-        var password = passwordEncoder.encode(rawPassword)
+        val password = passwordEncoder.encode(rawPassword)
         return ResponseEntity.ok(authService.getToken(username, password))
     }
 
@@ -74,7 +74,7 @@ class AuthController() {
         return ResponseEntity.ok(authService.activateUser(username, passwordEncoder.encode(password)))
     }
 
-    @PutMapping("Register")
+    @PutMapping("register")
     fun updateCredentials(
         @RequestBody(required = true) registration: RegistrationDTO,
         @RequestHeader("username", required = true) username: String,

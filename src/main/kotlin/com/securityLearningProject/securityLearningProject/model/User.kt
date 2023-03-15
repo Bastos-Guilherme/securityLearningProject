@@ -37,8 +37,8 @@ class User: UserDetails {
     @Enumerated(EnumType.STRING)
     var permissions: Set<Permission> = hashSetOf()
     var isActive: Boolean = true
-    var credentialsLastChange = LocalDate.now()
-    var lastSigning = LocalDate.now()
+    var credentialsLastChange: LocalDate = LocalDate.now()
+    var lastSigning: LocalDate = LocalDate.now()
     var failedLoginAttempts: Int = 0
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {

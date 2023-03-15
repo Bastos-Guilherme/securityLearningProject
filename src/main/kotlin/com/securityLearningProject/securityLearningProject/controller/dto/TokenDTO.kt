@@ -1,11 +1,11 @@
 package com.securityLearningProject.securityLearningProject.controller.dto
 
-import java.time.LocalDateTime
-import java.util.Date
+import java.time.LocalDate
+import java.util.*
 
 // class for transfer of token to user
 class TokenDTO {
 
     var token: String = ""
-    var expirationDateTime: Date = Date(System.currentTimeMillis())
+    var expirationDateTime: LocalDate = LocalDate.now()
 }
